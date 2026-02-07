@@ -7,6 +7,21 @@ return [
         'database' => env('MEDIA_EXIF_DATABASE', false),
     ],
 
+    '360' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Enable 360° Media Detection
+        |--------------------------------------------------------------------------
+        |
+        | Enable automatic detection of 360° photos and videos using XMP metadata
+        | and aspect ratio analysis. When enabled, media with equirectangular
+        | projection will be detected and marked for 360° viewing.
+        | Enabled by default.
+        |
+        */
+        'detection' => env('MEDIA_360_DETECTION', true),
+    ],
+
     'storage' => [
         'remote' => [
             /*

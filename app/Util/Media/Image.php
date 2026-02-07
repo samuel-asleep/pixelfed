@@ -4,6 +4,7 @@ namespace App\Util\Media;
 
 use App\Media;
 use App\Services\StatusService;
+use App\Util\Media\Media360Detector;
 use Cache;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\PngEncoder;
@@ -277,6 +278,27 @@ class Image
                 $media->orientation = $orientation;
                 $media->media_path = $converted['path'];
                 $media->mime = 'image/'.$outputExtension;
+
+                // Detect 360° media
+                if (config('media.360.detection', true)) {
+                    $imagePath = $localFs ? storage_path('app/'.$converted['path']) : null;
+                    if (!$imagePath && $this->defaultDisk !== 'local') {
+                        // For non-local storage, we need to create a temp file
+                        $tempFile = tempnam(sys_get_temp_dir(), '360_detect_');
+                        file_put_contents($tempFile, $encoded->toString());
+                        $imagePath = $tempFile;
+                    }
+
+                    if ($imagePath && file_exists($imagePath)) {
+                        $detection = Media360Detector::detect($imagePath, $img->width(), $img->height());
+                        $media->is_360 = $detection['is_360'];
+                        $media->projection_type = $detection['projection_type'];
+                        
+                        if (isset($tempFile) && file_exists($tempFile)) {
+                            unlink($tempFile);
+                        }
+                    }
+                }
             }
 
             $media->save();

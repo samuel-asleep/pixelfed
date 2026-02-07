@@ -50,6 +50,12 @@ class MediaTransformer extends Fractal\TransformerAbstract
             ];
         }
 
+        // Add 360° metadata if available
+        if ($media->is_360) {
+            $res['is_360'] = true;
+            $res['projection_type'] = $media->projection_type;
+        }
+
         return $res;
     }
 }

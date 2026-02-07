@@ -7,6 +7,7 @@ use App\Media;
 use App\Services\MediaService;
 use App\Services\StatusService;
 use App\Util\Media\Blurhash;
+use App\Util\Media\Media360Detector;
 use Cache;
 use FFMpeg;
 use Illuminate\Bus\Queueable;
@@ -101,6 +102,29 @@ class VideoThumbnail implements ShouldBeUniqueUntilProcessing, ShouldQueue
             if ($blurhash) {
                 $media->blurhash = $blurhash;
                 $media->save();
+            }
+
+            // Detect 360° video
+            if (config('media.360.detection', true)) {
+                $videoPath = storage_path('app/'.$base);
+                if (file_exists($videoPath)) {
+                    // Get video dimensions using FFProbe
+                    try {
+                        $ffprobe = \FFMpeg\FFProbe::create();
+                        $dimensions = $ffprobe
+                            ->streams($videoPath)
+                            ->videos()
+                            ->first()
+                            ->getDimensions();
+                        
+                        $detection = Media360Detector::detect($videoPath, $dimensions->getWidth(), $dimensions->getHeight());
+                        $media->is_360 = $detection['is_360'];
+                        $media->projection_type = $detection['projection_type'];
+                        $media->save();
+                    } catch (\Exception $e) {
+                        // If FFProbe fails, just skip 360 detection
+                    }
+                }
             }
 
             if (config('media.hls.enabled')) {

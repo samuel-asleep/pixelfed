@@ -23,6 +23,7 @@ class Media extends Model
         'srcset' => 'array',
         'deleted_at' => 'datetime',
         'skip_optimize' => 'boolean',
+        'is_360' => 'boolean',
     ];
 
     public function status()

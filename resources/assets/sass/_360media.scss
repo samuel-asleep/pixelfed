@@ -1,0 +1,20 @@
+/* Pannellum 360 Photo Viewer Styles */
+@import '~pannellum/build/pannellum.css';
+
+/* Video.js 360 Video Player Styles */
+@import '~video.js/dist/video-js.css';
+
+/* Additional 360 media styles */
+.pnlm-container {
+    border-radius: 0;
+}
+
+.video-js .vjs-big-play-button {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.vjs-vr-button {
+    cursor: pointer;
+}

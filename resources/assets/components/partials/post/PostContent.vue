@@ -4,11 +4,25 @@
         </div>
 
         <div v-else-if="!fixedHeight" class="postPresenterContainer" style="background: #000;">
-            <div v-if="status.pf_type === 'photo'" class="w-100">
+            <div v-if="status.pf_type === 'photo' && is360Photo" class="w-100">
+                <photo-360-presenter
+                    :status="status"
+                    :is-filtered="isFiltered"
+                    @togglecw="toggleContentWarning" />
+            </div>
+
+            <div v-else-if="status.pf_type === 'photo'" class="w-100">
                 <photo-presenter
                     :status="status"
                     :is-filtered="isFiltered"
                     @lightbox="toggleLightbox"
+                    @togglecw="toggleContentWarning" />
+            </div>
+
+            <div v-else-if="status.pf_type === 'video' && is360Video" class="w-100">
+                <video-360-player
+                    :status="statusRender"
+                    :fixed-height="fixedHeight"
                     @togglecw="toggleContentWarning" />
             </div>
 
@@ -168,12 +182,16 @@
     import BigPicture from "bigpicture";
     import ReadMore from "./ReadMore.vue";
     import VideoPlayer from "@/presenter/VideoPlayer.vue";
+    import Photo360Presenter from "@/presenter/Photo360Presenter.vue";
+    import Video360Player from "@/presenter/Video360Presenter.vue";
 
     export default {
 
         components: {
             "read-more": ReadMore,
-            "video-player": VideoPlayer
+            "video-player": VideoPlayer,
+            "photo-360-presenter": Photo360Presenter,
+            "video-360-player": Video360Player
         },
         props: {
 
@@ -208,6 +226,20 @@
             fixedHeight: {
                 get() {
                     return this.$store.state.fixedHeight == true;
+                }
+            },
+            is360Photo: {
+                get() {
+                    return this.status.media_attachments && 
+                           this.status.media_attachments.length > 0 &&
+                           this.status.media_attachments[0].is_360 === true;
+                }
+            },
+            is360Video: {
+                get() {
+                    return this.status.media_attachments && 
+                           this.status.media_attachments.length > 0 &&
+                           this.status.media_attachments[0].is_360 === true;
                 }
             }
         },
